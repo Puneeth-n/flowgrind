@@ -11,10 +11,15 @@
 #include <sys/types.h>
 #include <sys/uio.h>
 #include <unistd.h>
+//<<<<<<< HEAD
+//=======
+//#include <netinet/tcp.h>
+#include "tcp.h"
+//>>>>>>> origin/flowgrind-ancr
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <netinet/in_systm.h>
-#include <netinet/tcp.h>
+//#include <netinet/tcp.h>
 
 #define UNUSED_ARGUMENT(x) (void)x
 
@@ -139,6 +144,8 @@ struct _flow_settings
 	int cork;
 	int nonagle;
 	char cc_alg[TCP_CA_NAME_MAX];
+    char ro_alg[256];
+    int ro_mode;
 	int elcn;
 	int lcd;
 	int mtcp;
