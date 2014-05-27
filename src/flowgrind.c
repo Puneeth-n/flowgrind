@@ -818,8 +818,8 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		"{s:i,s:d,s:d}" /* response */
 		"{s:i,s:d,s:d}" /* interpacket_gap */
 		"{s:b,s:b,s:i,s:i}"
-		"{s:s}"
-		"{s:i,s:i,s:i,s:i,s:i}"
+		"{s:s,s:s}"
+		"{s:i,s:i,s:i,s:i,s:i,s:i}"
 #ifdef HAVE_LIBPCAP
 		"{s:s}"
 #endif /* HAVE_LIBPCAP */
@@ -867,6 +867,8 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		"nonagle", cflow[id].settings[DESTINATION].nonagle,
 
 		"cc_alg", cflow[id].settings[DESTINATION].cc_alg,
+		"ro_alg", cflow[id].settings[DESTINATION].ro_alg,
+		"ro_mode", cflow[id].settings[DESTINATION].ro_mode,
 
 		"elcn", cflow[id].settings[DESTINATION].elcn,
 		"lcd", cflow[id].settings[DESTINATION].lcd,
@@ -924,8 +926,8 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		"{s:i,s:d,s:d}" /* response */
 		"{s:i,s:d,s:d}" /* interpacket_gap */
 		"{s:b,s:b,s:i,s:i}"
-		"{s:s}"
-		"{s:i,s:i,s:i,s:i,s:i}"
+		"{s:s,s:s}"
+		"{s:i,s:i,s:i,s:i,s:i,s:i}"
 #ifdef HAVE_LIBPCAP
 		"{s:s}"
 #endif /* HAVE_LIBPCAP */
@@ -975,6 +977,8 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		"nonagle", (int)cflow[id].settings[SOURCE].nonagle,
 
 		"cc_alg", cflow[id].settings[SOURCE].cc_alg,
+		"ro_alg", cflow[id].settings[SOURCE].ro_alg,
+		"ro_mode", cflow[id].settings[SOURCE].ro_mode,
 
 		"elcn", cflow[id].settings[SOURCE].elcn,
 		"lcd", cflow[id].settings[SOURCE].lcd,
@@ -2385,13 +2389,26 @@ static void parse_flow_option(int ch, char* arg, int flow_id, int endpoint_id) {
 				usage(EXIT_FAILURE);
 			}
 			strcpy(settings->cc_alg, arg + 16);
-		} else if (!memcmp(arg, "TCP_CONGESTION=", 15)) {
+		}
+        else if (!memcmp(arg, "TCP_CONGESTION=", 15)) {
 			if (strlen(arg + 16) >= sizeof(cflow[0].settings[SOURCE].cc_alg)) {
 				errx("too large string for TCP_CONGESTION value");
 				usage(EXIT_FAILURE);
 			}
 			strcpy(settings->cc_alg, arg + 15);
-		} else if (!strcmp(arg, "SO_DEBUG")) {
+		}
+        else if (!memcmp(arg, "TCP_REORDER_MODULE=", 19)) {
+			if (strlen(arg + 19) >= sizeof(cflow[0].settings[SOURCE].ro_alg)) {
+				errx("too large string for TCP_REORDER_MODULE value");
+				usage(EXIT_FAILURE);
+			}
+			strcpy(settings->ro_alg, arg + 19);
+		}
+        else if (!memcmp(arg, "TCP_REORDER_MODE=", 17)) {
+            strcpy(settings->ro_mode, arg + 17);
+		}
+
+        else if (!strcmp(arg, "SO_DEBUG")) {
 			settings->so_debug = 1;
 		} else if (!strcmp(arg, "IP_MTU_DISCOVER")) {
 			settings->ipmtudiscover = 1;
