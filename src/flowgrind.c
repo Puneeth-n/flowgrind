@@ -1070,6 +1070,10 @@ has_more_reports:
 		if (rpc_env.fault_occurred) {
 			errx("XML-RPC fault: %s (%d)", rpc_env.fault_string,
 			      rpc_env.fault_code);
+			//puneeth
+			printf("first fault\n");
+			exit(1);
+
 			continue;
 		}
 
@@ -1087,6 +1091,9 @@ has_more_reports:
 		if (rpc_env.fault_occurred) {
 			errx("XML-RPC fault: %s (%d)", rpc_env.fault_string,
 			      rpc_env.fault_code);
+			//puneeth
+			printf("second fault\n");
+			exit(1);
 			xmlrpc_DECREF(rv);
 			continue;
 		}
