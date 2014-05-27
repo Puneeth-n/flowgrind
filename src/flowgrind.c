@@ -508,6 +508,8 @@ static void init_flow_options(void)
 			cflow[id].settings[i].pushy = 0;
 			cflow[id].settings[i].cork = 0;
 			cflow[id].settings[i].cc_alg[0] = 0;
+			cflow[id].settings[i].ro_alg[0] = 0;
+			cflow[id].settings[i].ro_mode = 1;
 			cflow[id].settings[i].elcn = 0;
 			cflow[id].settings[i].lcd = 0;
 			cflow[id].settings[i].mtcp = 0;
@@ -2188,7 +2190,7 @@ static void parse_rate_option(char *arg, int flow_id, int endpoint_id) {
 	if (type != 'b' && type != 'B') {
 		errx("illegal type specifier (either 'b' or 'B') for flow %u", flow_id);
 		usage(EXIT_FAILURE);
-	}	
+	}
 	if (type == 'b')
 		optdouble /=  8;
 
