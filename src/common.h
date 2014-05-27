@@ -216,8 +216,16 @@ struct _fg_tcp_info {
 	int tcpi_rttvar;
 	int tcpi_rto;
 	int tcpi_backoff;
-	int tcpi_snd_mss;
 	int tcpi_ca_state;
+	int tcpi_snd_mss;
+//puneeth
+/*
+	int tcpi_total_retrans;
+	int tcpi_total_fast_retrans;
+	int tcpi_total_rto_retrans;
+	int tcpi_dupthresh;
+//puneeth
+*/
 };
 
 /* Report (measurement sample) of a flow */
