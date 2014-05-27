@@ -218,7 +218,20 @@ int add_flow_source(struct _request_add_flow_source *request)
 		num_flows--;
 		return -1;
 	}
-#endif /* TCP_CONGESTION */
+//<<<<<<< HEAD
+//#endif /* TCP_CONGESTION */
+//=======
+	opt_len = sizeof(request->ro_alg);
+	if (getsockopt(flow->fd, IPPROTO_TCP, TCP_REORDER_MODULE,
+				request->ro_alg, &opt_len) == -1) {
+		request_error(&request->r, "failed to determine actual reorder algorithm: %s",
+			strerror(errno));
+		uninit_flow(flow);
+		num_flows--;
+		return -1;
+	}
+#endif
+//>>>>>>> origin/flowgrind-ancr
 
 #ifdef HAVE_LIBPCAP
 	fg_pcap_go(flow);

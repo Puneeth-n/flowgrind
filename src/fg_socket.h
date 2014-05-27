@@ -29,10 +29,23 @@
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
 
-#include <netinet/tcp.h>
+//#include <netinet/tcp.h>
+#include "tcp.h"
 #include <sys/socket.h>
 
+//<<<<<<< HEAD
+//=======
+#ifndef TCP_REORDER_MODULE
+#define TCP_REORDER_MODULE 15
+#endif
+
+#ifndef TCP_REORDER_MODE
+#define TCP_REORDER_MODE 16
+#endif
+
+//>>>>>>> origin/flowgrind-ancr
 int set_congestion_control(int fd, const char *cc_alg);
+int set_reorder(int fd, const char *ro_alg);
 int set_so_debug(int fd);
 int set_keepalive(int fd, int how);
 int set_nodelay(int fd);

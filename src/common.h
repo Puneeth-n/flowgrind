@@ -27,9 +27,27 @@
 #define _COMMON_H_
 
 #ifdef HAVE_CONFIG_H
+//<<<<<<< HEAD
 #include "config.h"
 #endif /* HAVE_CONFIG_H */
+/*=======
+#include <config.h>
+#endif
 
+#include <limits.h>
+#include <netinet/in.h>
+#include <stdio.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/uio.h>
+#include <unistd.h>
+//#include <netinet/tcp.h>
+#include "tcp.h"
+#include <sys/socket.h>
+
+#define UNUSED_ARGUMENT(x) (void)x
+>>>>>>> origin/flowgrind-ancr
+*/
 #include "gitversion.h"
 
 #ifdef GITVERSION
@@ -175,7 +193,12 @@ struct _flow_settings {
 
 	int cork;
 	int nonagle;
+//<<<<<<< HEAD
 	char cc_alg[TCP_CA_NAME_MAX];
+//=======
+        char ro_alg[256];
+        int ro_mode;
+//>>>>>>> origin/flowgrind-ancr
 	int elcn;
 	int lcd;
 	int mtcp;

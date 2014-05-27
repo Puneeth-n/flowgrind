@@ -202,7 +202,10 @@ struct _request_add_flow_source
 
 	/* The request reply */
 	int flow_id;
+//<<<<<<< HEAD
 	char cc_alg[TCP_CA_NAME_MAX];
+        char ro_alg[256];
+//>>>>>>> origin/flowgrind-ancr
 	int real_send_buffer_size;
 	int real_read_buffer_size;
 };
