@@ -371,10 +371,10 @@ static xmlrpc_value * add_flow_source(xmlrpc_env * const env,
 	}
 
 	/* Return our result. */
-	ret = xmlrpc_build_value(env, "{s:i,s:s,s:i,s:i}",
+	ret = xmlrpc_build_value(env, "{s:i,s:s,s:s,s:i,s:i}",
 		"flow_id", request->flow_id,
 		"cc_alg", request->cc_alg,
-//		"ro_alg", request->ro_alg,
+		"ro_alg", request->ro_alg,
 		"real_send_buffer_size", request->real_send_buffer_size,
 		"real_read_buffer_size", request->real_read_buffer_size);
 
@@ -382,7 +382,7 @@ cleanup:
 	if (request)
 		free_all(request->r.error, request);
 	free_all(destination_host, cc_alg, bind_address);
-//	free_all(destination_host, cc_alg, ro_alg, bind_address);
+	free_all(destination_host, cc_alg, ro_alg, bind_address);
 
 	if (extra_options)
 		xmlrpc_DECREF(extra_options);

@@ -180,7 +180,7 @@ struct _flow_settings {
 	int nonagle;
 	char cc_alg[TCP_CA_NAME_MAX];
 	char ro_alg[256];
-        int ro_mode;
+    int ro_mode;
 	int elcn;
 	int lcd;
 	int mtcp;
