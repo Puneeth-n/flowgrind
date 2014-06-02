@@ -996,9 +996,9 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		"destination_address", cflow[id].endpoint[DESTINATION].test_address,
 		"destination_port", listen_data_port,
 		"late_connect", (int)cflow[id].late_connect);
-//		printf("%s\t%s\t%s",cflow[id].settings[SOURCE].cc_alg,cflow[id].settings[SOURCE].ro_alg,cflow[id].settings[SOURCE].ro_mode);
+	printf("%d\n",cflow[id].settings[SOURCE].ro_mode);
 	printf("%s\n",cflow[id].settings[SOURCE].ro_alg);
-//	exit(0);
+	printf("%s\n",cflow[id].settings[SOURCE].cc_alg);
 	die_if_fault_occurred(&rpc_env);
 	printf("After fault\n");
 
@@ -2407,7 +2407,8 @@ static void parse_flow_option(int ch, char* arg, int flow_id, int endpoint_id) {
 			}
 			strcpy(settings->ro_alg, arg + 19);
 		} else if (!memcmp(arg, "TCP_REORDER_MODE=", 17)) {
-			strcpy(settings->ro_mode, arg + 17);
+			settings->ro_mode = arg [17] - '0';
+			printf("%d\n",settings->ro_mode);
 		} else if (!strcmp(arg, "SO_DEBUG")) {
 			settings->so_debug = 1;
 		} else if (!strcmp(arg, "IP_MTU_DISCOVER")) {
@@ -2739,8 +2740,10 @@ static void parse_cmdline(int argc, char *argv[]) {
 				}
 
 				for (int i = 0; i < cur_num_flows; i++) {
-					if (type == 's' || type == 'b')
+					if (type == 's' || type == 'b'){
+						printf("before call to parse_flow_option\n");
 						parse_flow_option(ch, arg, current_flow_ids[i], SOURCE);
+					}
 					if (type == 'd' || type == 'b')
 						parse_flow_option(ch, arg, current_flow_ids[i], DESTINATION);
 				}
