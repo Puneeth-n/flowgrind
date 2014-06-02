@@ -477,7 +477,7 @@ static xmlrpc_value * add_flow_destination(xmlrpc_env * const env,
 		"nonagle", &settings.nonagle,
 
 		"cc_alg", &cc_alg,
-//		"ro_alg", &ro_alg,
+		"ro_alg", &ro_alg,
 		"ro_mode", &settings.ro_mode,
 		"elcn", &settings.elcn,
 		"lcd", &settings.lcd,
@@ -501,7 +501,7 @@ static xmlrpc_value * add_flow_destination(xmlrpc_env * const env,
 		settings.maximum_block_size < MIN_BLOCK_SIZE ||
 		settings.write_rate < 0 ||
 		strlen(cc_alg) > TCP_CA_NAME_MAX ||
-//		strlen(ro_alg) > TCP_CA_NAME_MAX ||
+		strlen(ro_alg) > TCP_CA_NAME_MAX ||
 		settings.num_extra_socket_options < 0 || settings.num_extra_socket_options > MAX_EXTRA_SOCKET_OPTIONS ||
 		xmlrpc_array_size(env, extra_options) != settings.num_extra_socket_options) {
 		XMLRPC_FAIL(env, XMLRPC_TYPE_ERROR, "Flow settings incorrect");
