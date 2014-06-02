@@ -78,6 +78,9 @@
 #define IP_MTU 14
 #endif /* IP_MTU */
 
+//#define TCP_REORDER 31
+//#define TCP_REORDER_MODE 32
+
 int set_window_size_directed(int fd, int window, int direction)
 {
 	int rc, try, w;
@@ -281,28 +284,18 @@ int set_congestion_control(int fd, const char *cc_alg)
 
 int set_reorder(int fd, const char *ro_alg)
 {
-#ifdef __LINUX__
 	DEBUG_MSG(LOG_NOTICE, "Setting ro_alg=\"%s\" for fd %d", ro_alg, fd);
-	return setsockopt(fd, IPPROTO_TCP, TCP_REORDER_MODULE, ro_alg, strlen(ro_alg));
-#else
-	UNUSED_ARGUMENT(fd);
-	UNUSED_ARGUMENT(ro_alg);
-	DEBUG_MSG(LOG_ERR, "Cannot set ro_alg for OS other than Linux");
-	return -1;
-#endif
+	return setsockopt(fd, IPPROTO_TCP, TCP_REORDER, ro_alg, strlen(ro_alg));
 }
 
 int set_so_ro_mode(int fd, int ro_mode)
 {
-#ifdef __LINUX__
 	DEBUG_MSG(LOG_NOTICE, "Setting TCP_REORDER_MODE on fd %d", fd);
 	return setsockopt(fd, IPPROTO_TCP, TCP_REORDER_MODE, &ro_mode, sizeof(ro_mode));
-#else
 	UNUSED_ARGUMENT(fd);
 	UNUSED_ARGUMENT(ro_mode);
 	DEBUG_MSG(LOG_ERR, "Cannot set TCP_REORDER_MODE for OS other than Linux");
 	return -1;
-#endif
 }
 
 int set_so_elcn(int fd, int val)

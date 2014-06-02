@@ -42,7 +42,8 @@
 #include <sys/utsname.h>
 #include <sys/wait.h>
 #include <netinet/in.h>
-#include <netinet/tcp.h>
+//#include <netinet/tcp.h>
+#include "tcp.h"
 #include <fcntl.h>
 #include <netdb.h>
 #include <getopt.h>

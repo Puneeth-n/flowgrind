@@ -508,6 +508,8 @@ static void init_flow_options(void)
 			cflow[id].settings[i].pushy = 0;
 			cflow[id].settings[i].cork = 0;
 			cflow[id].settings[i].cc_alg[0] = 0;
+			cflow[id].settings[i].ro_alg[0] = 0;
+			cflow[id].settings[i].ro_mode = 1;
 			cflow[id].settings[i].elcn = 0;
 			cflow[id].settings[i].lcd = 0;
 			cflow[id].settings[i].mtcp = 0;
@@ -730,6 +732,7 @@ static void prepare_grinding(xmlrpc_client *rpc_client)
 			return;
 		prepare_flow(id, rpc_client);
 	}
+	printf("after prepare flow\n");
 
 	/* prepare headline */
 	char headline[200];
@@ -816,8 +819,8 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		"{s:i,s:d,s:d}" /* response */
 		"{s:i,s:d,s:d}" /* interpacket_gap */
 		"{s:b,s:b,s:i,s:i}"
-		"{s:s}"
-		"{s:i,s:i,s:i,s:i,s:i}"
+		"{s:s,s:s}"
+		"{s:i,s:i,s:i,s:i,s:i,s:i}"
 #ifdef HAVE_LIBPCAP
 		"{s:s}"
 #endif /* HAVE_LIBPCAP */
@@ -865,6 +868,8 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		"nonagle", cflow[id].settings[DESTINATION].nonagle,
 
 		"cc_alg", cflow[id].settings[DESTINATION].cc_alg,
+		"ro_alg", cflow[id].settings[DESTINATION].ro_alg,
+		"ro_mode", cflow[id].settings[DESTINATION].ro_mode,
 
 		"elcn", cflow[id].settings[DESTINATION].elcn,
 		"lcd", cflow[id].settings[DESTINATION].lcd,
@@ -922,8 +927,8 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		"{s:i,s:d,s:d}" /* response */
 		"{s:i,s:d,s:d}" /* interpacket_gap */
 		"{s:b,s:b,s:i,s:i}"
-		"{s:s}"
-		"{s:i,s:i,s:i,s:i,s:i}"
+		"{s:s,s:s}"
+		"{s:i,s:i,s:i,s:i,s:i,s:i}"
 #ifdef HAVE_LIBPCAP
 		"{s:s}"
 #endif /* HAVE_LIBPCAP */
@@ -973,6 +978,8 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		"nonagle", (int)cflow[id].settings[SOURCE].nonagle,
 
 		"cc_alg", cflow[id].settings[SOURCE].cc_alg,
+		"ro_alg", cflow[id].settings[SOURCE].ro_alg,
+		"ro_mode", cflow[id].settings[SOURCE].ro_mode,
 
 		"elcn", cflow[id].settings[SOURCE].elcn,
 		"lcd", cflow[id].settings[SOURCE].lcd,
@@ -989,7 +996,11 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		"destination_address", cflow[id].endpoint[DESTINATION].test_address,
 		"destination_port", listen_data_port,
 		"late_connect", (int)cflow[id].late_connect);
+//		printf("%s\t%s\t%s",cflow[id].settings[SOURCE].cc_alg,cflow[id].settings[SOURCE].ro_alg,cflow[id].settings[SOURCE].ro_mode);
+	printf("%s\n",cflow[id].settings[SOURCE].ro_alg);
+//	exit(0);
 	die_if_fault_occurred(&rpc_env);
+	printf("After fault\n");
 
 	xmlrpc_DECREF(extra_options);
 
@@ -2389,6 +2400,14 @@ static void parse_flow_option(int ch, char* arg, int flow_id, int endpoint_id) {
 				usage(EXIT_FAILURE);
 			}
 			strcpy(settings->cc_alg, arg + 15);
+		} else if (!memcmp(arg, "TCP_REORDER_MODULE=", 19)) {
+			if (strlen(arg + 19) >= sizeof(cflow[0].settings[SOURCE].ro_alg)) {
+				errx("too large string for TCP_REORDER value");
+				usage(EXIT_FAILURE);
+			}
+			strcpy(settings->ro_alg, arg + 19);
+		} else if (!memcmp(arg, "TCP_REORDER_MODE=", 17)) {
+			strcpy(settings->ro_mode, arg + 17);
 		} else if (!strcmp(arg, "SO_DEBUG")) {
 			settings->so_debug = 1;
 		} else if (!strcmp(arg, "IP_MTU_DISCOVER")) {
@@ -2884,9 +2903,11 @@ int main(int argc, char *argv[])
 	if (!sigint_caught)
 		check_idle(rpc_client);
 
+	printf("Before prepare flows\n");
 	DEBUG_MSG(LOG_WARNING, "prepare flows");
 	if (!sigint_caught)
 		prepare_grinding(rpc_client);
+	printf("After prepare flows\n");
 
 	DEBUG_MSG(LOG_WARNING, "start flows");
 	if (!sigint_caught)
