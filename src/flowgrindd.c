@@ -228,8 +228,8 @@ static xmlrpc_value * add_flow_source(xmlrpc_env * const env,
 		"{s:i,s:d,s:d,*}" /* response */
 		"{s:i,s:d,s:d,*}" /* interpacket_gap */
 		"{s:b,s:b,s:i,s:i,*}"
-		"{s:s,*}"
-		"{s:i,s:i,s:i,s:i,s:i,*}"
+		"{s:s,s:s,*}"
+		"{s:i,s:i,s:i,s:i,s:i,s:i,*}"
 #ifdef HAVE_LIBPCAP
 		"{s:s,*}"
 #endif /* HAVE_LIBPCAP */
@@ -428,8 +428,8 @@ static xmlrpc_value * add_flow_destination(xmlrpc_env * const env,
 		"{s:i,s:d,s:d,*}" /* response */
 		"{s:i,s:d,s:d,*}" /* interpacket_gap */
 		"{s:b,s:b,s:i,s:i,*}"
-		"{s:s,*}"
-		"{s:i,s:i,s:i,s:i,s:i,*}"
+		"{s:s,s:s,*}"
+		"{s:i,s:i,s:i,s:i,s:i,s:i,*}"
 #ifdef HAVE_LIBPCAP
 		"{s:s,*}"
 #endif /* HAVE_LIBPCAP */
@@ -547,7 +547,7 @@ static xmlrpc_value * add_flow_destination(xmlrpc_env * const env,
 	}
 
 	strcpy(settings.cc_alg, cc_alg);
-//	strcpy(settings.ro_alg, ro_alg);
+	strcpy(settings.ro_alg, ro_alg);
 	strcpy(settings.bind_address, bind_address);
 	DEBUG_MSG(LOG_WARNING, "bind_address=%s", bind_address);
 	request = malloc(sizeof(struct _request_add_flow_destination));
