@@ -296,6 +296,7 @@ static xmlrpc_value * add_flow_source(xmlrpc_env * const env,
 		"destination_address", &destination_host,
 		"destination_port", &source_settings.destination_port,
 		"late_connect", &source_settings.late_connect);
+	printf("ro_alg: %s, cc_alg: %s\n",ro_alg,cc_alg);
 
 	if (env->fault_occurred){
 		printf ("flowgrindd: add_source error");
