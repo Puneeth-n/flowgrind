@@ -2199,7 +2199,7 @@ static void parse_rate_option(char *arg, int flow_id, int endpoint_id) {
 	if (type != 'b' && type != 'B') {
 		errx("illegal type specifier (either 'b' or 'B') for flow %u", flow_id);
 		usage(EXIT_FAILURE);
-	}	
+	}
 	if (type == 'b')
 		optdouble /=  8;
 

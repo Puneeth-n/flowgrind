@@ -228,8 +228,8 @@ static xmlrpc_value * add_flow_source(xmlrpc_env * const env,
 		"{s:i,s:d,s:d,*}" /* response */
 		"{s:i,s:d,s:d,*}" /* interpacket_gap */
 		"{s:b,s:b,s:i,s:i,*}"
-		"{s:s,*}"
-		"{s:i,s:i,s:i,s:i,s:i,*}"
+		"{s:s,s:s,*}"
+		"{s:i,s:i,s:i,s:i,s:i,s:i,*}"
 #ifdef HAVE_LIBPCAP
 		"{s:s,*}"
 #endif /* HAVE_LIBPCAP */
@@ -371,7 +371,7 @@ static xmlrpc_value * add_flow_source(xmlrpc_env * const env,
 	}
 
 	/* Return our result. */
-	ret = xmlrpc_build_value(env, "{s:i,s:s,s:i,s:i}",
+	ret = xmlrpc_build_value(env, "{s:i,s:s,s:s,s:i,s:i}",
 		"flow_id", request->flow_id,
 		"cc_alg", request->cc_alg,
 		"ro_alg", request->ro_alg,
@@ -382,7 +382,7 @@ cleanup:
 	if (request)
 		free_all(request->r.error, request);
 	free_all(destination_host, cc_alg, bind_address);
-//	free_all(destination_host, cc_alg, ro_alg, bind_address);
+	free_all(destination_host, cc_alg, ro_alg, bind_address);
 
 	if (extra_options)
 		xmlrpc_DECREF(extra_options);
@@ -552,6 +552,8 @@ static xmlrpc_value * add_flow_destination(xmlrpc_env * const env,
 	printf("AFter copying cc_alg to struct\n");
 	strcpy(settings.ro_alg, ro_alg);
 	printf("AFter copying ro_alg to struct\n");
+	strcpy(settings.ro_alg, ro_alg);
+
 	strcpy(settings.bind_address, bind_address);
 	DEBUG_MSG(LOG_WARNING, "bind_address=%s", bind_address);
 	request = malloc(sizeof(struct _request_add_flow_destination));
