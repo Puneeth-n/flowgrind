@@ -881,15 +881,19 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 #endif /* HAVE_LIBPCAP */
 		"num_extra_socket_options", cflow[id].settings[DESTINATION].num_extra_socket_options,
 		"extra_socket_options", extra_options);
+	printf("flowgrind: after add_flow_destination\n");
 
 	die_if_fault_occurred(&rpc_env);
+	printf("flowgrind: before parse value\n");
 
 	xmlrpc_parse_value(&rpc_env, resultP, "{s:i,s:i,s:i,s:i,*}",
 		"flow_id", &cflow[id].endpoint_id[DESTINATION],
 		"listen_data_port", &listen_data_port,
 		"real_listen_send_buffer_size", &cflow[id].endpoint[DESTINATION].send_buffer_size_real,
 		"real_listen_read_buffer_size", &cflow[id].endpoint[DESTINATION].receive_buffer_size_real);
+	printf("flowgrind: after parse value\n");
 	die_if_fault_occurred(&rpc_env);
+	printf("flowgrind: before resultP check\n");
 
 	if (resultP)
 		xmlrpc_DECREF(resultP);
@@ -912,6 +916,7 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		xmlrpc_DECREF(option);
 	}
 	DEBUG_MSG(LOG_WARNING, "prepare flow %d source", id);
+	printf("flowgrind: Prepare flow source\n");
 
 	xmlrpc_client_call2f(&rpc_env, rpc_client,
 		cflow[id].endpoint[SOURCE].daemon->server_url,
