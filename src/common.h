@@ -179,7 +179,7 @@ struct _flow_settings {
 	int cork;
 	int nonagle;
 	char cc_alg[TCP_CA_NAME_MAX];
-	char ro_alg[256];
+	char ro_alg[TCP_CA_NAME_MAX];
         int ro_mode;
 	int elcn;
 	int lcd;

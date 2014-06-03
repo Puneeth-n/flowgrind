@@ -374,7 +374,7 @@ static xmlrpc_value * add_flow_source(xmlrpc_env * const env,
 	ret = xmlrpc_build_value(env, "{s:i,s:s,s:i,s:i}",
 		"flow_id", request->flow_id,
 		"cc_alg", request->cc_alg,
-//		"ro_alg", request->ro_alg,
+		"ro_alg", request->ro_alg,
 		"real_send_buffer_size", request->real_send_buffer_size,
 		"real_read_buffer_size", request->real_read_buffer_size);
 
@@ -428,8 +428,8 @@ static xmlrpc_value * add_flow_destination(xmlrpc_env * const env,
 		"{s:i,s:d,s:d,*}" /* response */
 		"{s:i,s:d,s:d,*}" /* interpacket_gap */
 		"{s:b,s:b,s:i,s:i,*}"
-		"{s:s,*}"
-		"{s:i,s:i,s:i,s:i,s:i,*}"
+		"{s:s,s:s,*}"
+		"{s:i,s:i,s:i,s:i,s:i,s:i,*}"
 #ifdef HAVE_LIBPCAP
 		"{s:s,*}"
 #endif /* HAVE_LIBPCAP */
@@ -477,7 +477,7 @@ static xmlrpc_value * add_flow_destination(xmlrpc_env * const env,
 		"nonagle", &settings.nonagle,
 
 		"cc_alg", &cc_alg,
-//		"ro_alg", &ro_alg,
+		"ro_alg", &ro_alg,
 		"ro_mode", &settings.ro_mode,
 		"elcn", &settings.elcn,
 		"lcd", &settings.lcd,
@@ -490,9 +490,11 @@ static xmlrpc_value * add_flow_destination(xmlrpc_env * const env,
 		"num_extra_socket_options", &settings.num_extra_socket_options,
 		"extra_socket_options", &extra_options);
 
-	if (env->fault_occurred)
+	printf("ro_alg: %s, cc_alg: %s\n",ro_alg,cc_alg);
+	if (env->fault_occurred){
+		printf("Fault occured in destination\n");
 		goto cleanup;
-
+	}
 	/* Check for sanity */
 	if (strlen(bind_address) >= sizeof(settings.bind_address) - 1 ||
 		settings.delay[WRITE] < 0 || settings.duration[WRITE] < 0 ||
@@ -501,7 +503,7 @@ static xmlrpc_value * add_flow_destination(xmlrpc_env * const env,
 		settings.maximum_block_size < MIN_BLOCK_SIZE ||
 		settings.write_rate < 0 ||
 		strlen(cc_alg) > TCP_CA_NAME_MAX ||
-//		strlen(ro_alg) > TCP_CA_NAME_MAX ||
+		strlen(ro_alg) > TCP_CA_NAME_MAX ||
 		settings.num_extra_socket_options < 0 || settings.num_extra_socket_options > MAX_EXTRA_SOCKET_OPTIONS ||
 		xmlrpc_array_size(env, extra_options) != settings.num_extra_socket_options) {
 		XMLRPC_FAIL(env, XMLRPC_TYPE_ERROR, "Flow settings incorrect");
@@ -547,7 +549,9 @@ static xmlrpc_value * add_flow_destination(xmlrpc_env * const env,
 	}
 
 	strcpy(settings.cc_alg, cc_alg);
-//	strcpy(settings.ro_alg, ro_alg);
+	printf("AFter copying cc_alg to struct\n");
+	strcpy(settings.ro_alg, ro_alg);
+	printf("AFter copying ro_alg to struct\n");
 	strcpy(settings.bind_address, bind_address);
 	DEBUG_MSG(LOG_WARNING, "bind_address=%s", bind_address);
 	request = malloc(sizeof(struct _request_add_flow_destination));

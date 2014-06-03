@@ -809,20 +809,20 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		cflow[id].endpoint[DESTINATION].daemon->server_url,
 		"add_flow_destination", &resultP,
 		"("
-		"{s:s}"
-		"{s:d,s:d,s:d,s:d,s:d}"
-		"{s:i,s:i}"
-		"{s:i}"
-		"{s:b,s:b,s:b,s:b,s:b}"
-		"{s:i,s:i}"
-		"{s:i,s:d,s:d}" /* request */
-		"{s:i,s:d,s:d}" /* response */
-		"{s:i,s:d,s:d}" /* interpacket_gap */
-		"{s:b,s:b,s:i,s:i}"
-		"{s:s,s:s}"
-		"{s:i,s:i,s:i,s:i,s:i,s:i}"
+		"{s:s}"			    //bind address
+		"{s:d,s:d,s:d,s:d,s:d}"	    //write delay-duration,read delay-duration, reporting interval 
+		"{s:i,s:i}"		    //send buf size, read buf size
+		"{s:i}"			    //max bloc size
+		"{s:b,s:b,s:b,s:b,s:b}"	    //trafic dump, so_debug, route_record, pushy, shutdown
+		"{s:i,s:i}"		    //write rate, random seed
+		"{s:i,s:d,s:d}" /* request *///Req distribution, parm 1, parm 2
+		"{s:i,s:d,s:d}" /* response *///response distr parm 1 parm 2
+		"{s:i,s:d,s:d}" /* interpacket_gap */ // distr parm 1 parm 2
+		"{s:b,s:b,s:i,s:i}"	    //flow control, byte counting, cork, nonagle
+		"{s:s,s:s}"		    //cc_alg, ro_alg
+		"{s:i,s:i,s:i,s:i,s:i,s:i}" //ro_mode, elcn, lcd, mtcp, dscp, ipmtudiscovery 
 #ifdef HAVE_LIBPCAP
-		"{s:s}"
+		"{s:s}"			    //
 #endif /* HAVE_LIBPCAP */
 		"{s:i,s:A}"
 		")",
