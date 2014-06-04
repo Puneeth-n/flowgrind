@@ -221,6 +221,9 @@ int add_flow_source(struct _request_add_flow_source *request)
 		num_flows--;
 		return -1;
 	}
+	else {
+		logging_log(LOG_ALERT, "getsockopt: The congestion control algorithm on the socket %s",request->cc_alg);
+	}
 	opt_len = sizeof(request->ro_alg);
 	if (getsockopt(flow->fd, IPPROTO_TCP, TCP_REORDER_MODULE,
 				request->ro_alg, &opt_len) == -1) {
@@ -229,6 +232,9 @@ int add_flow_source(struct _request_add_flow_source *request)
 		uninit_flow(flow);
 		num_flows--;
 		return -1;
+	}
+	else {
+		logging_log(LOG_ALERT, "getsockopt: The Reordering algorithm on the socket %s",request->ro_alg);
 	}
 #endif
 

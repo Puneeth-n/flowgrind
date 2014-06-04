@@ -732,7 +732,6 @@ static void prepare_grinding(xmlrpc_client *rpc_client)
 			return;
 		prepare_flow(id, rpc_client);
 	}
-	printf("after prepare flow\n");
 
 	/* prepare headline */
 	char headline[200];
@@ -881,19 +880,15 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 #endif /* HAVE_LIBPCAP */
 		"num_extra_socket_options", cflow[id].settings[DESTINATION].num_extra_socket_options,
 		"extra_socket_options", extra_options);
-	printf("flowgrind: after add_flow_destination\n");
 
 	die_if_fault_occurred(&rpc_env);
-	printf("flowgrind: before parse value\n");
 
 	xmlrpc_parse_value(&rpc_env, resultP, "{s:i,s:i,s:i,s:i,*}",
 		"flow_id", &cflow[id].endpoint_id[DESTINATION],
 		"listen_data_port", &listen_data_port,
 		"real_listen_send_buffer_size", &cflow[id].endpoint[DESTINATION].send_buffer_size_real,
 		"real_listen_read_buffer_size", &cflow[id].endpoint[DESTINATION].receive_buffer_size_real);
-	printf("flowgrind: after parse value\n");
 	die_if_fault_occurred(&rpc_env);
-	printf("flowgrind: before resultP check\n");
 
 	if (resultP)
 		xmlrpc_DECREF(resultP);
@@ -916,7 +911,6 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		xmlrpc_DECREF(option);
 	}
 	DEBUG_MSG(LOG_WARNING, "prepare flow %d source", id);
-	printf("flowgrind: Prepare flow source\n");
 
 	xmlrpc_client_call2f(&rpc_env, rpc_client,
 		cflow[id].endpoint[SOURCE].daemon->server_url,
@@ -1001,11 +995,7 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		"destination_address", cflow[id].endpoint[DESTINATION].test_address,
 		"destination_port", listen_data_port,
 		"late_connect", (int)cflow[id].late_connect);
-	printf("%d\n",cflow[id].settings[SOURCE].ro_mode);
-	printf("%s\n",cflow[id].settings[SOURCE].ro_alg);
-	printf("%s\n",cflow[id].settings[SOURCE].cc_alg);
 	die_if_fault_occurred(&rpc_env);
-	printf("After fault\n");
 
 	xmlrpc_DECREF(extra_options);
 
@@ -2413,7 +2403,6 @@ static void parse_flow_option(int ch, char* arg, int flow_id, int endpoint_id) {
 			strcpy(settings->ro_alg, arg + 19);
 		} else if (!memcmp(arg, "TCP_REORDER_MODE=", 17)) {
 			settings->ro_mode = arg [17] - '0';
-			printf("%d\n",settings->ro_mode);
 		} else if (!strcmp(arg, "SO_DEBUG")) {
 			settings->so_debug = 1;
 		} else if (!strcmp(arg, "IP_MTU_DISCOVER")) {
@@ -2746,7 +2735,6 @@ static void parse_cmdline(int argc, char *argv[]) {
 
 				for (int i = 0; i < cur_num_flows; i++) {
 					if (type == 's' || type == 'b'){
-						printf("before call to parse_flow_option\n");
 						parse_flow_option(ch, arg, current_flow_ids[i], SOURCE);
 					}
 					if (type == 'd' || type == 'b')
@@ -2911,11 +2899,9 @@ int main(int argc, char *argv[])
 	if (!sigint_caught)
 		check_idle(rpc_client);
 
-	printf("Before prepare flows\n");
 	DEBUG_MSG(LOG_WARNING, "prepare flows");
 	if (!sigint_caught)
 		prepare_grinding(rpc_client);
-	printf("After prepare flows\n");
 
 	DEBUG_MSG(LOG_WARNING, "start flows");
 	if (!sigint_caught)

@@ -276,10 +276,8 @@ int accept_data(struct _flow *flow)
 			    real_receive_buffer_size);
 		return -1;
 	}
-	logging_log(LOG_WARNING, "Before call to set_flow_tcp_options");
 	if (set_flow_tcp_options(flow) == -1)
 		return -1;
-	logging_log(LOG_WARNING, "After call to set_flow_tcp_options");
 	DEBUG_MSG(LOG_NOTICE, "data socket accepted");
 	flow->state = GRIND;
 	flow->connect_called = 1;

@@ -214,7 +214,6 @@ static xmlrpc_value * add_flow_source(xmlrpc_env * const env,
 	struct _request_add_flow_source* request = 0;
 
 	DEBUG_MSG(LOG_WARNING, "Method add_flow_source called");
-	printf("Method add_flow_source called\n");
 
 	/* Parse our argument array. */
 	xmlrpc_decompose_value(env, param_array,
@@ -296,10 +295,8 @@ static xmlrpc_value * add_flow_source(xmlrpc_env * const env,
 		"destination_address", &destination_host,
 		"destination_port", &source_settings.destination_port,
 		"late_connect", &source_settings.late_connect);
-	printf("ro_alg: %s, cc_alg: %s\n",ro_alg,cc_alg);
 
 	if (env->fault_occurred){
-		printf ("flowgrindd: add_source error");
 		goto cleanup;
 	}
 
@@ -366,9 +363,7 @@ static xmlrpc_value * add_flow_source(xmlrpc_env * const env,
 	strcpy(settings.ro_alg, ro_alg);
 	strcpy(settings.bind_address, bind_address);
 
-	printf ("flowgrindd: Befor malloc\n");
 	request = malloc(sizeof(struct _request_add_flow_source));
-	printf ("flowgrindd: After malloc\n");
 	request->settings = settings;
 	request->source_settings = source_settings;
 	rc = dispatch_request((struct _request*)request, REQUEST_ADD_SOURCE);
@@ -496,9 +491,7 @@ static xmlrpc_value * add_flow_destination(xmlrpc_env * const env,
 		"num_extra_socket_options", &settings.num_extra_socket_options,
 		"extra_socket_options", &extra_options);
 
-	printf("ro_alg: %s, cc_alg: %s\n",ro_alg,cc_alg);
 	if (env->fault_occurred){
-		printf("Fault occured in destination\n");
 		goto cleanup;
 	}
 	/* Check for sanity */
@@ -555,38 +548,29 @@ static xmlrpc_value * add_flow_destination(xmlrpc_env * const env,
 	}
 
 	strcpy(settings.cc_alg, cc_alg);
-	printf("AFter copying cc_alg to struct\n");
 	strcpy(settings.ro_alg, ro_alg);
-	printf("AFter copying ro_alg to struct\n");
 
 	strcpy(settings.bind_address, bind_address);
-	printf("AFter bind address\n");
 	DEBUG_MSG(LOG_WARNING, "bind_address=%s", bind_address);
 	request = malloc(sizeof(struct _request_add_flow_destination));
-	printf("AFter malloc\n");
 	request->settings = settings;
 	rc = dispatch_request((struct _request*)request, REQUEST_ADD_DESTINATION);
-	printf("AFter dsipatch\n");
 
 	if (rc == -1) {
-		printf("DIspatch Error\n");
 		XMLRPC_FAIL(env, XMLRPC_INTERNAL_ERROR, request->r.error); /* goto cleanup on failure */
 	}
 
 	/* Return our result. */
-	printf("Before Build\n");
 	ret = xmlrpc_build_value(env, "{s:i,s:i,s:i,s:i}",
 		"flow_id", request->flow_id,
 		"listen_data_port", request->listen_data_port,
 		"real_listen_send_buffer_size", request->real_listen_send_buffer_size,
 		"real_listen_read_buffer_size", request->real_listen_read_buffer_size);
-	printf("After Build\n");
 
 cleanup:
 	if (request)
 		free_all(request->r.error, request);
 	free_all(cc_alg, ro_alg, bind_address);
-	printf("In cleanup\n");
 
 	if (extra_options)
 		xmlrpc_DECREF(extra_options);
@@ -595,7 +579,6 @@ cleanup:
 		logging_log(LOG_WARNING, "Method add_flow_destination failed: %s", env->fault_string);
 	else {
 		DEBUG_MSG(LOG_WARNING, "Method add_flow_destination successful");
-		printf("Method add_flow_destination successful\n");
 	}
 
 	return ret;
@@ -882,7 +865,6 @@ void create_daemon_thread()
 	pthread_mutex_init(&mutex, NULL);
 
 	int rc = pthread_create(&daemon_thread, NULL, daemon_main, 0);
-	printf("Black is back!\n");
 	if (rc)
 		crit("could not start thread");
 }
