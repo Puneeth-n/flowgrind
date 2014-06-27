@@ -180,7 +180,7 @@ struct _flow_settings {
 	int nonagle;
 	char cc_alg[TCP_CA_NAME_MAX];
 	char ro_alg[TCP_CA_NAME_MAX];
-        int ro_mode;
+    int ro_mode;
 	int elcn;
 	int lcd;
 	int mtcp;
@@ -218,14 +218,10 @@ struct _fg_tcp_info {
 	int tcpi_backoff;
 	int tcpi_ca_state;
 	int tcpi_snd_mss;
-//puneeth
-/*
 	int tcpi_total_retrans;
 	int tcpi_total_fast_retrans;
 	int tcpi_total_rto_retrans;
 	int tcpi_dupthresh;
-//puneeth
-*/
 };
 
 /* Report (measurement sample) of a flow */

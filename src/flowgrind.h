@@ -121,6 +121,10 @@ enum column_id {
         COL_TCP_CA_STATE,
         COL_SMSS,
         COL_PMTU,                                           /** @} */
+        COL_CRET,
+        COL_CFRET,
+        COL_CTRET,
+        COL_DUPTH,
 #ifdef DEBUG
         /** Read / write status */
         COL_STATUS
