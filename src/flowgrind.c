@@ -177,6 +177,14 @@ static struct _column column_info[] = {
 	 .header.unit = "[B]", .state.visible = true},
 	{.type = COL_PMTU, .header.name = " pmtu",
 	 .header.unit = "[B]", .state.visible = true},
+	{.type = COL_CRET, .header.name = " cret",
+	 .header.unit = "[#]", .state.visible = true},
+	{.type = COL_CFRET, .header.name = " cfret",
+	 .header.unit = "[#]", .state.visible = true},
+	{.type = COL_CTRET, .header.name = " ctret",
+	 .header.unit = "[#]", .state.visible = true},
+	{.type = COL_DUPTH, .header.name = " dupth",
+	 .header.unit = "[#]", .state.visible = true},
 #ifdef DEBUG
 	{.type = COL_STATUS, .header.name = " status",
 	 .header.unit = " ", .state.visible = false}
@@ -508,6 +516,8 @@ static void init_flow_options(void)
 			cflow[id].settings[i].pushy = 0;
 			cflow[id].settings[i].cork = 0;
 			cflow[id].settings[i].cc_alg[0] = 0;
+			cflow[id].settings[i].ro_alg[0] = 0;
+			cflow[id].settings[i].ro_mode = 1;
 			cflow[id].settings[i].elcn = 0;
 			cflow[id].settings[i].lcd = 0;
 			cflow[id].settings[i].mtcp = 0;
@@ -806,20 +816,20 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		cflow[id].endpoint[DESTINATION].daemon->server_url,
 		"add_flow_destination", &resultP,
 		"("
-		"{s:s}"
-		"{s:d,s:d,s:d,s:d,s:d}"
-		"{s:i,s:i}"
-		"{s:i}"
-		"{s:b,s:b,s:b,s:b,s:b}"
-		"{s:i,s:i}"
-		"{s:i,s:d,s:d}" /* request */
-		"{s:i,s:d,s:d}" /* response */
-		"{s:i,s:d,s:d}" /* interpacket_gap */
-		"{s:b,s:b,s:i,s:i}"
-		"{s:s}"
-		"{s:i,s:i,s:i,s:i,s:i}"
+		"{s:s}"			    //bind address
+		"{s:d,s:d,s:d,s:d,s:d}"	    //write delay-duration,read delay-duration, reporting interval
+		"{s:i,s:i}"		    //send buf size, read buf size
+		"{s:i}"			    //max bloc size
+		"{s:b,s:b,s:b,s:b,s:b}"	    //trafic dump, so_debug, route_record, pushy, shutdown
+		"{s:i,s:i}"		    //write rate, random seed
+		"{s:i,s:d,s:d}" /* request *///Req distribution, parm 1, parm 2
+		"{s:i,s:d,s:d}" /* response *///response distr parm 1 parm 2
+		"{s:i,s:d,s:d}" /* interpacket_gap */ // distr parm 1 parm 2
+		"{s:b,s:b,s:i,s:i}"	    //flow control, byte counting, cork, nonagle
+		"{s:s,s:s}"		    //cc_alg, ro_alg
+		"{s:i,s:i,s:i,s:i,s:i,s:i}" //ro_mode, elcn, lcd, mtcp, dscp, ipmtudiscovery
 #ifdef HAVE_LIBPCAP
-		"{s:s}"
+		"{s:s}"			    //
 #endif /* HAVE_LIBPCAP */
 		"{s:i,s:A}"
 		")",
@@ -865,6 +875,8 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		"nonagle", cflow[id].settings[DESTINATION].nonagle,
 
 		"cc_alg", cflow[id].settings[DESTINATION].cc_alg,
+		"ro_alg", cflow[id].settings[DESTINATION].ro_alg,
+		"ro_mode", cflow[id].settings[DESTINATION].ro_mode,
 
 		"elcn", cflow[id].settings[DESTINATION].elcn,
 		"lcd", cflow[id].settings[DESTINATION].lcd,
@@ -922,8 +934,8 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		"{s:i,s:d,s:d}" /* response */
 		"{s:i,s:d,s:d}" /* interpacket_gap */
 		"{s:b,s:b,s:i,s:i}"
-		"{s:s}"
-		"{s:i,s:i,s:i,s:i,s:i}"
+		"{s:s,s:s}"
+		"{s:i,s:i,s:i,s:i,s:i,s:i}"
 #ifdef HAVE_LIBPCAP
 		"{s:s}"
 #endif /* HAVE_LIBPCAP */
@@ -973,6 +985,8 @@ static void prepare_flow(int id, xmlrpc_client *rpc_client)
 		"nonagle", (int)cflow[id].settings[SOURCE].nonagle,
 
 		"cc_alg", cflow[id].settings[SOURCE].cc_alg,
+		"ro_alg", cflow[id].settings[SOURCE].ro_alg,
+		"ro_mode", cflow[id].settings[SOURCE].ro_mode,
 
 		"elcn", cflow[id].settings[SOURCE].elcn,
 		"lcd", cflow[id].settings[SOURCE].lcd,
@@ -1107,6 +1121,10 @@ has_more_reports:
 				int tcpi_rto;
 				int tcpi_backoff;
 				int tcpi_ca_state;
+                int tcpi_total_retrans;
+                int tcpi_total_fast_retrans;
+                int tcpi_total_rto_retrans;
+                int tcpi_dupthresh;
 				int tcpi_snd_mss;
 				int bytes_read_low, bytes_read_high;
 				int bytes_written_low, bytes_written_high;
@@ -1121,7 +1139,7 @@ has_more_reports:
 					"{s:i,s:i,s:i,s:i,s:i,*}" /* TCP info */
 					"{s:i,s:i,s:i,s:i,s:i,*}" /* ...      */
 					"{s:i,s:i,s:i,s:i,s:i,*}" /* ...      */
-					"{s:i,*}"
+                    "{s:i,s:i,s:i,s:i,s:i,*}"
 					")",
 
 					"id", &report.id,
@@ -1170,6 +1188,10 @@ has_more_reports:
 					"tcpi_rto", &tcpi_rto,
 					"tcpi_backoff", &tcpi_backoff,
 					"tcpi_ca_state", &tcpi_ca_state,
+                    "tcpi_total_retrans", &tcpi_total_retrans,
+                    "tcpi_total_fast_retrans", &tcpi_total_fast_retrans,
+                    "tcpi_total_rto_retrans", &tcpi_total_rto_retrans,
+                    "tcpi_dupthresh", &tcpi_dupthresh,
 					"tcpi_snd_mss", &tcpi_snd_mss,
 
 					"status", &report.status
@@ -1202,6 +1224,10 @@ has_more_reports:
 				report.tcp_info.tcpi_rto = tcpi_rto;
 				report.tcp_info.tcpi_backoff = tcpi_backoff;
 				report.tcp_info.tcpi_ca_state = tcpi_ca_state;
+                report.tcp_info.tcpi_total_retrans = tcpi_total_retrans;
+                report.tcp_info.tcpi_total_fast_retrans = tcpi_total_fast_retrans;
+                report.tcp_info.tcpi_total_rto_retrans = tcpi_total_rto_retrans;
+                report.tcp_info.tcpi_dupthresh = tcpi_dupthresh;
 				report.tcp_info.tcpi_snd_mss = tcpi_snd_mss;
 
 				report.begin.tv_sec = begin_sec;
@@ -1566,8 +1592,9 @@ static char *create_output(char hash, int id, int type, double begin, double end
 		   unsigned int sack, unsigned int lost, unsigned int reor,
 		   unsigned int retr, unsigned int tret, unsigned int fack,
 		   double linrtt, double linrttvar, double linrto,
-		   unsigned int backoff, int ca_state, int snd_mss,  int pmtu,
-		   char* status)
+		   unsigned int backoff, int ca_state,
+           unsigned int totret, unsigned int totfret, unsigned int totrtoret,
+           int dupthresh, int snd_mss, int pmtu, char* status)
 {
 	int columnWidthChanged = 0;
 	static int counter = 0;
@@ -1667,6 +1694,14 @@ static char *create_output(char hash, int id, int type, double begin, double end
 		      snd_mss, 0, &columnWidthChanged);
 	create_column(headerString1, headerString2, dataString, COL_PMTU,
 		      pmtu, 0, &columnWidthChanged);
+	create_column(headerString1, headerString2, dataString, COL_CRET,
+		      totret, 0, &columnWidthChanged);
+	create_column(headerString1, headerString2, dataString, COL_CFRET,
+		      totfret, 0, &columnWidthChanged);
+	create_column(headerString1, headerString2, dataString, COL_CTRET,
+		      totrtoret, 0, &columnWidthChanged);
+	create_column(headerString1, headerString2, dataString, COL_DUPTH,
+		      dupthresh, 0, &columnWidthChanged);
 #ifdef DEBUG
 	create_column_str(headerString1, headerString2, dataString, COL_STATUS,
 			  status, &columnWidthChanged);
@@ -1803,13 +1838,17 @@ static void print_report(int id, int endpoint, struct _report* r)
 			     (unsigned int)r->tcp_info.tcpi_lost,
 			     (unsigned int)r->tcp_info.tcpi_reordering,
 			     (unsigned int)r->tcp_info.tcpi_retrans,
-			     (unsigned int)r->tcp_info.tcpi_retransmits,
-			     (unsigned int)r->tcp_info.tcpi_fackets,
-			     (double)r->tcp_info.tcpi_rtt / 1e3,
-			     (double)r->tcp_info.tcpi_rttvar / 1e3,
-			     (double)r->tcp_info.tcpi_rto / 1e3,
-			     (unsigned int)r->tcp_info.tcpi_backoff,
-			     r->tcp_info.tcpi_ca_state,
+                 (unsigned int)r->tcp_info.tcpi_retransmits,
+                 (unsigned int)r->tcp_info.tcpi_fackets,
+                 (double)r->tcp_info.tcpi_rtt / 1e3,
+                 (double)r->tcp_info.tcpi_rttvar / 1e3,
+                 (double)r->tcp_info.tcpi_rto / 1e3,
+                 (unsigned int)r->tcp_info.tcpi_backoff,
+                 r->tcp_info.tcpi_ca_state,
+                 (unsigned int)r->tcp_info.tcpi_total_retrans,
+                 (unsigned int)r->tcp_info.tcpi_total_fast_retrans,
+                 (unsigned int)r->tcp_info.tcpi_total_rto_retrans,
+                 (int)r->tcp_info.tcpi_dupthresh,
 			     (unsigned int)r->tcp_info.tcpi_snd_mss,
 			     r->pmtu, comment_buffer));
 	strncpy(report_buffer, rep_string, sizeof(report_buffer));
@@ -2386,6 +2425,14 @@ static void parse_flow_option_endpoint(int code, const char* arg, int flow_id, i
 				usage(EXIT_FAILURE);
 			}
 			strcpy(settings->cc_alg, arg + 15);
+		} else if (!memcmp(arg, "TCP_REORDER_MODULE=", 19)) {
+			if (strlen(arg + 19) >= sizeof(cflow[0].settings[SOURCE].ro_alg)) {
+				errx("too large string for TCP_REORDER value");
+				usage(EXIT_FAILURE);
+			}
+			strcpy(settings->ro_alg, arg + 19);
+		} else if (!memcmp(arg, "TCP_REORDER_MODE=", 17)) {
+			settings->ro_mode = arg [17] - '0';
 		} else if (!strcmp(arg, "SO_DEBUG")) {
 			settings->so_debug = 1;
 		} else if (!strcmp(arg, "IP_MTU_DISCOVER")) {
@@ -2508,7 +2555,8 @@ static void parse_colon_option(const char *arg)
 		     COL_TCP_SSTH, COL_TCP_UACK, COL_TCP_SACK, COL_TCP_LOST,
 		     COL_TCP_RETR, COL_TCP_TRET, COL_TCP_FACK, COL_TCP_REOR,
 		     COL_TCP_BKOF, COL_TCP_RTT, COL_TCP_RTTVAR, COL_TCP_RTO,
-		     COL_TCP_CA_STATE, COL_SMSS, COL_PMTU);
+		     COL_TCP_CA_STATE, COL_SMSS,
+             COL_PMTU, COL_CRET, COL_CFRET, COL_CTRET, COL_DUPTH);
 #ifdef DEBUG
 	HIDE_COLUMNS(COL_STATUS);
 #endif /* DEBUG */
@@ -2537,7 +2585,7 @@ static void parse_colon_option(const char *arg)
 				     COL_TCP_TRET, COL_TCP_FACK, COL_TCP_REOR,
 				     COL_TCP_BKOF, COL_TCP_RTT, COL_TCP_RTTVAR,
 				     COL_TCP_RTO, COL_TCP_CA_STATE, COL_SMSS,
-				     COL_PMTU);
+				     COL_PMTU, COL_CRET, COL_CFRET, COL_CTRET, COL_DUPTH);
 #ifdef DEBUG
 		} else if (!strcmp(token, "status")) {
 			SHOW_COLUMNS(COL_STATUS);
