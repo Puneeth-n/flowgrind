@@ -1692,6 +1692,8 @@ static char *create_output(char hash, int id, int type, double begin, double end
 			  COL_TCP_CA_STATE, tmp, &columnWidthChanged);
 	create_column(headerString1, headerString2, dataString, COL_SMSS,
 		      snd_mss, 0, &columnWidthChanged);
+	create_column(headerString1, headerString2, dataString, COL_PMTU,
+		      pmtu, 0, &columnWidthChanged);
 	create_column(headerString1, headerString2, dataString, COL_CRET,
 		      totret, 0, &columnWidthChanged);
 	create_column(headerString1, headerString2, dataString, COL_CFRET,
