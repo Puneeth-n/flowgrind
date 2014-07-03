@@ -222,6 +222,8 @@ struct _fg_tcp_info {
 	int tcpi_total_fast_retrans;
 	int tcpi_total_rto_retrans;
 	int tcpi_dupthresh;
+	int tcpi_last_reor_sample;
+	int tcpi_total_dsacks;
 };
 
 /* Report (measurement sample) of a flow */

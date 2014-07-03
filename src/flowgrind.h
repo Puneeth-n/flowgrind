@@ -125,6 +125,8 @@ enum column_id {
         COL_CFRET,
         COL_CTRET,
         COL_DUPTH,
+        COL_LREOS,
+        COL_TDSAC,
 #ifdef DEBUG
         /** Read / write status */
         COL_STATUS
@@ -136,10 +138,10 @@ enum opt_types {
 	/** General controller options */
 	OPT_CONTROLLER,
 	/** Selects a subset of flows to apply options to (-F) */
-	OPT_SELECTOR,	
+	OPT_SELECTOR,
 	/** Flow option without endpoint string */
 	OPT_FLOW,
-	/** Flow option with endpoint string */	
+	/** Flow option with endpoint string */
 	OPT_FLOW_ENDPOINT,
 };
 

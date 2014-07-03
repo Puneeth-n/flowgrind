@@ -660,6 +660,8 @@ int get_tcp_info(struct _flow *flow, struct _fg_tcp_info *info)
 	CPY_INFO_MEMBER(tcpi_total_fast_retrans);
 	CPY_INFO_MEMBER(tcpi_total_rto_retrans);
 	CPY_INFO_MEMBER(tcpi_dupthresh);
+	CPY_INFO_MEMBER(tcpi_last_reor_sample);
+	CPY_INFO_MEMBER(tcpi_total_dsacks);
 #endif /* __LINUX__ */
 #else
 	memset(info, 0, sizeof(struct _fg_tcp_info));

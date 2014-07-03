@@ -185,6 +185,10 @@ static struct _column column_info[] = {
 	 .header.unit = "[#]", .state.visible = true},
 	{.type = COL_DUPTH, .header.name = " dupth",
 	 .header.unit = "[#]", .state.visible = true},
+	{.type = COL_LREOS, .header.name = " lreos",
+	 .header.unit = "[#]", .state.visible = true},
+	{.type = COL_TDSAC, .header.name = " tdsac",
+	 .header.unit = "[#]", .state.visible = true},
 #ifdef DEBUG
 	{.type = COL_STATUS, .header.name = " status",
 	 .header.unit = " ", .state.visible = false}
@@ -1125,6 +1129,8 @@ has_more_reports:
                 int tcpi_total_fast_retrans;
                 int tcpi_total_rto_retrans;
                 int tcpi_dupthresh;
+                int tcpi_last_reor_sample;
+                int tcpi_total_dsacks;
 				int tcpi_snd_mss;
 				int bytes_read_low, bytes_read_high;
 				int bytes_written_low, bytes_written_high;
@@ -1192,6 +1198,8 @@ has_more_reports:
                     "tcpi_total_fast_retrans", &tcpi_total_fast_retrans,
                     "tcpi_total_rto_retrans", &tcpi_total_rto_retrans,
                     "tcpi_dupthresh", &tcpi_dupthresh,
+                    "tcpi_last_reor_sample", &tcpi_last_reor_sample,
+                    "tcpi_total_dsacks", &tcpi_total_dsacks,
 					"tcpi_snd_mss", &tcpi_snd_mss,
 
 					"status", &report.status
@@ -1228,6 +1236,8 @@ has_more_reports:
                 report.tcp_info.tcpi_total_fast_retrans = tcpi_total_fast_retrans;
                 report.tcp_info.tcpi_total_rto_retrans = tcpi_total_rto_retrans;
                 report.tcp_info.tcpi_dupthresh = tcpi_dupthresh;
+                report.tcp_info.tcpi_last_reor_sample = tcpi_last_reor_sample;
+                report.tcp_info.tcpi_total_dsacks = tcpi_total_dsacks;
 				report.tcp_info.tcpi_snd_mss = tcpi_snd_mss;
 
 				report.begin.tv_sec = begin_sec;
@@ -1594,7 +1604,7 @@ static char *create_output(char hash, int id, int type, double begin, double end
 		   double linrtt, double linrttvar, double linrto,
 		   unsigned int backoff, int ca_state,
            unsigned int totret, unsigned int totfret, unsigned int totrtoret,
-           int dupthresh, int snd_mss, int pmtu, char* status)
+           int dupthresh, int lreos, int tdsac, int snd_mss, int pmtu, char* status)
 {
 	int columnWidthChanged = 0;
 	static int counter = 0;
@@ -1702,6 +1712,10 @@ static char *create_output(char hash, int id, int type, double begin, double end
 		      totrtoret, 0, &columnWidthChanged);
 	create_column(headerString1, headerString2, dataString, COL_DUPTH,
 		      dupthresh, 0, &columnWidthChanged);
+	create_column(headerString1, headerString2, dataString, COL_LREOS,
+		      lreos, 0, &columnWidthChanged);
+	create_column(headerString1, headerString2, dataString, COL_TDSAC,
+		      tdsac, 0, &columnWidthChanged);
 #ifdef DEBUG
 	create_column_str(headerString1, headerString2, dataString, COL_STATUS,
 			  status, &columnWidthChanged);
@@ -1849,6 +1863,8 @@ static void print_report(int id, int endpoint, struct _report* r)
                  (unsigned int)r->tcp_info.tcpi_total_fast_retrans,
                  (unsigned int)r->tcp_info.tcpi_total_rto_retrans,
                  (int)r->tcp_info.tcpi_dupthresh,
+                 (unsigned int)r->tcp_info.tcpi_last_reor_sample,
+                 (unsigned int)r->tcp_info.tcpi_total_dsacks,
 			     (unsigned int)r->tcp_info.tcpi_snd_mss,
 			     r->pmtu, comment_buffer));
 	strncpy(report_buffer, rep_string, sizeof(report_buffer));
@@ -2686,7 +2702,7 @@ static void parse_general_option(int code, const char* arg, const char* opt_stri
 		} else if (!strcmp(arg, "byte")) {
 			copt.force_unit = BYTE_BASED;
 		} else {
-			errx("invalid argument '%s' for option '%s'", 
+			errx("invalid argument '%s' for option '%s'",
 				arg, opt_string);
 			usage(EXIT_FAILURE);
 		}
@@ -2699,7 +2715,7 @@ static void parse_general_option(int code, const char* arg, const char* opt_stri
 		usage(EXIT_FAILURE);
 		break;
 	}
-	
+
 }
 
 static void parse_cmdline(int argc, char *argv[]) {
@@ -2751,7 +2767,7 @@ static void parse_cmdline(int argc, char *argv[]) {
 		{'U', 0, ap_yes, OPT_FLOW_ENDPOINT},
 		{'W', 0, ap_yes, OPT_FLOW_ENDPOINT},
 		{'Y', 0, ap_yes, OPT_FLOW_ENDPOINT},
-		{0, 0, ap_no, 0} 
+		{0, 0, ap_no, 0}
 	};
 
 	struct _arg_parser parser;
@@ -2774,7 +2790,7 @@ static void parse_cmdline(int argc, char *argv[]) {
 		char *argcpy = strdup(arg);
 		const char *opt_string = ap_opt_string(&parser, argind);
 		int tag = ap_option(&parser, argind)->tag;
-		
+
 		/* distinguish option types by tag first */
 		switch (tag) {
 		case OPT_CONTROLLER:
@@ -2826,9 +2842,9 @@ static void parse_cmdline(int argc, char *argv[]) {
 
 				for (int i = 0; i < cur_num_flows; i++) {
 					if (type == 's' || type == 'b')
-						parse_flow_option_endpoint(code, arg, current_flow_ids[i], SOURCE);	
+						parse_flow_option_endpoint(code, arg, current_flow_ids[i], SOURCE);
 					if (type == 'd' || type == 'b')
-						parse_flow_option_endpoint(code, arg, current_flow_ids[i], DESTINATION);	
+						parse_flow_option_endpoint(code, arg, current_flow_ids[i], DESTINATION);
 				}
 			}
 			break;

@@ -715,6 +715,8 @@ static xmlrpc_value * method_get_reports(xmlrpc_env * const env,
             "tcpi_total_fast_retrans", (int)report->tcp_info.tcpi_total_fast_retrans,
             "tcpi_total_rto_retrans", (int)report->tcp_info.tcpi_total_rto_retrans,
             "tcpi_dupthresh", (int)report->tcp_info.tcpi_dupthresh,
+            "tcpi_last_reor_sample", (int)report->tcp_info.tcpi_last_reor_sample,
+            "tcpi_total_dsacks", (int)report->tcp_info.tcpi_total_dsacks,
 			"tcpi_snd_mss", (int)report->tcp_info.tcpi_snd_mss,
 
 			"status", report->status
