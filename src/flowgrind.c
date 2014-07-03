@@ -1145,7 +1145,7 @@ has_more_reports:
 					"{s:i,s:i,s:i,s:i,s:i,*}" /* TCP info */
 					"{s:i,s:i,s:i,s:i,s:i,*}" /* ...      */
 					"{s:i,s:i,s:i,s:i,s:i,*}" /* ...      */
-                    "{s:i,s:i,s:i,s:i,s:i,*}"
+                    "{s:i,s:i,s:i,s:i,s:i,s:i,s:i,*}"
 					")",
 
 					"id", &report.id,
@@ -2572,7 +2572,7 @@ static void parse_colon_option(const char *arg)
 		     COL_TCP_RETR, COL_TCP_TRET, COL_TCP_FACK, COL_TCP_REOR,
 		     COL_TCP_BKOF, COL_TCP_RTT, COL_TCP_RTTVAR, COL_TCP_RTO,
 		     COL_TCP_CA_STATE, COL_SMSS,
-             COL_PMTU, COL_CRET, COL_CFRET, COL_CTRET, COL_DUPTH);
+             COL_PMTU, COL_CRET, COL_CFRET, COL_CTRET, COL_DUPTH, COL_LREOS, COL_TDSAC);
 #ifdef DEBUG
 	HIDE_COLUMNS(COL_STATUS);
 #endif /* DEBUG */
@@ -2601,7 +2601,7 @@ static void parse_colon_option(const char *arg)
 				     COL_TCP_TRET, COL_TCP_FACK, COL_TCP_REOR,
 				     COL_TCP_BKOF, COL_TCP_RTT, COL_TCP_RTTVAR,
 				     COL_TCP_RTO, COL_TCP_CA_STATE, COL_SMSS,
-				     COL_PMTU, COL_CRET, COL_CFRET, COL_CTRET, COL_DUPTH);
+				     COL_PMTU, COL_CRET, COL_CFRET, COL_CTRET, COL_DUPTH, COL_LREOS, COL_TDSAC);
 #ifdef DEBUG
 		} else if (!strcmp(token, "status")) {
 			SHOW_COLUMNS(COL_STATUS);

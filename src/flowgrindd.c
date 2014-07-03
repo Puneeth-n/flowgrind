@@ -662,7 +662,7 @@ static xmlrpc_value * method_get_reports(xmlrpc_env * const env,
 			"{s:i,s:i,s:i,s:i,s:i}" /* TCP info */
 			"{s:i,s:i,s:i,s:i,s:i}" /* ...      */
 			"{s:i,s:i,s:i,s:i,s:i}" /* ...      */
-            "{s:i,s:i,s:i,s:i,s:i}"
+            "{s:i,s:i,s:i,s:i,s:i,s:i,s:i}"
 			")",
 
 			"id", report->id,
