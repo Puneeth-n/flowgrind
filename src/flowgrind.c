@@ -521,7 +521,7 @@ static void init_flow_options(void)
 			cflow[id].settings[i].cork = 0;
 			cflow[id].settings[i].cc_alg[0] = 0;
 			cflow[id].settings[i].ro_alg[0] = 0;
-			cflow[id].settings[i].ro_mode = 1;
+			cflow[id].settings[i].ro_mode = 0;
 			cflow[id].settings[i].elcn = 0;
 			cflow[id].settings[i].lcd = 0;
 			cflow[id].settings[i].mtcp = 0;
