@@ -1125,12 +1125,12 @@ has_more_reports:
 				int tcpi_rto;
 				int tcpi_backoff;
 				int tcpi_ca_state;
-                int tcpi_total_retrans;
-                int tcpi_total_fast_retrans;
-                int tcpi_total_rto_retrans;
-                int tcpi_dupthresh;
-                int tcpi_last_reor_sample;
-                int tcpi_total_dsacks;
+				int tcpi_total_retrans;
+				int tcpi_total_fast_retrans;
+				int tcpi_total_rto_retrans;
+				int tcpi_dupthresh;
+				int tcpi_last_reor_sample;
+				int tcpi_total_dsacks;
 				int tcpi_snd_mss;
 				int bytes_read_low, bytes_read_high;
 				int bytes_written_low, bytes_written_high;
@@ -1194,14 +1194,13 @@ has_more_reports:
 					"tcpi_rto", &tcpi_rto,
 					"tcpi_backoff", &tcpi_backoff,
 					"tcpi_ca_state", &tcpi_ca_state,
-                    "tcpi_total_retrans", &tcpi_total_retrans,
-                    "tcpi_total_fast_retrans", &tcpi_total_fast_retrans,
-                    "tcpi_total_rto_retrans", &tcpi_total_rto_retrans,
-                    "tcpi_dupthresh", &tcpi_dupthresh,
-                    "tcpi_last_reor_sample", &tcpi_last_reor_sample,
-                    "tcpi_total_dsacks", &tcpi_total_dsacks,
+					"tcpi_total_retrans", &tcpi_total_retrans,
+					"tcpi_total_fast_retrans", &tcpi_total_fast_retrans,
+					"tcpi_total_rto_retrans", &tcpi_total_rto_retrans,
+					"tcpi_dupthresh", &tcpi_dupthresh,
+					"tcpi_last_reor_sample", &tcpi_last_reor_sample,
+					"tcpi_total_dsacks", &tcpi_total_dsacks,
 					"tcpi_snd_mss", &tcpi_snd_mss,
-
 					"status", &report.status
 				);
 				xmlrpc_DECREF(rv);
@@ -1232,12 +1231,12 @@ has_more_reports:
 				report.tcp_info.tcpi_rto = tcpi_rto;
 				report.tcp_info.tcpi_backoff = tcpi_backoff;
 				report.tcp_info.tcpi_ca_state = tcpi_ca_state;
-                report.tcp_info.tcpi_total_retrans = tcpi_total_retrans;
-                report.tcp_info.tcpi_total_fast_retrans = tcpi_total_fast_retrans;
-                report.tcp_info.tcpi_total_rto_retrans = tcpi_total_rto_retrans;
-                report.tcp_info.tcpi_dupthresh = tcpi_dupthresh;
-                report.tcp_info.tcpi_last_reor_sample = tcpi_last_reor_sample;
-                report.tcp_info.tcpi_total_dsacks = tcpi_total_dsacks;
+				report.tcp_info.tcpi_total_retrans = tcpi_total_retrans;
+				report.tcp_info.tcpi_total_fast_retrans = tcpi_total_fast_retrans;
+				report.tcp_info.tcpi_total_rto_retrans = tcpi_total_rto_retrans;
+				report.tcp_info.tcpi_dupthresh = tcpi_dupthresh;
+				report.tcp_info.tcpi_last_reor_sample = tcpi_last_reor_sample;
+				report.tcp_info.tcpi_total_dsacks = tcpi_total_dsacks;
 				report.tcp_info.tcpi_snd_mss = tcpi_snd_mss;
 
 				report.begin.tv_sec = begin_sec;
@@ -1603,8 +1602,8 @@ static char *create_output(char hash, int id, int type, double begin, double end
 		   unsigned int retr, unsigned int tret, unsigned int fack,
 		   double linrtt, double linrttvar, double linrto,
 		   unsigned int backoff, int ca_state,
-           unsigned int totret, unsigned int totfret, unsigned int totrtoret,
-           int dupthresh, int lreos, int tdsac, int snd_mss, int pmtu, char* status)
+		   unsigned int totret, unsigned int totfret, unsigned int totrtoret,
+		   int dupthresh, int lreos, int tdsac, int snd_mss, int pmtu, char* status)
 {
 	int columnWidthChanged = 0;
 	static int counter = 0;
@@ -1852,19 +1851,19 @@ static void print_report(int id, int endpoint, struct _report* r)
 			     (unsigned int)r->tcp_info.tcpi_lost,
 			     (unsigned int)r->tcp_info.tcpi_reordering,
 			     (unsigned int)r->tcp_info.tcpi_retrans,
-                 (unsigned int)r->tcp_info.tcpi_retransmits,
-                 (unsigned int)r->tcp_info.tcpi_fackets,
-                 (double)r->tcp_info.tcpi_rtt / 1e3,
-                 (double)r->tcp_info.tcpi_rttvar / 1e3,
-                 (double)r->tcp_info.tcpi_rto / 1e3,
-                 (unsigned int)r->tcp_info.tcpi_backoff,
-                 r->tcp_info.tcpi_ca_state,
-                 (unsigned int)r->tcp_info.tcpi_total_retrans,
-                 (unsigned int)r->tcp_info.tcpi_total_fast_retrans,
-                 (unsigned int)r->tcp_info.tcpi_total_rto_retrans,
-                 (int)r->tcp_info.tcpi_dupthresh,
-                 (unsigned int)r->tcp_info.tcpi_last_reor_sample,
-                 (unsigned int)r->tcp_info.tcpi_total_dsacks,
+			     (unsigned int)r->tcp_info.tcpi_retransmits,
+			     (unsigned int)r->tcp_info.tcpi_fackets,
+			     (double)r->tcp_info.tcpi_rtt / 1e3,
+			     (double)r->tcp_info.tcpi_rttvar / 1e3,
+			     (double)r->tcp_info.tcpi_rto / 1e3,
+			     (unsigned int)r->tcp_info.tcpi_backoff,
+			     r->tcp_info.tcpi_ca_state,
+			     (unsigned int)r->tcp_info.tcpi_total_retrans,
+			     (unsigned int)r->tcp_info.tcpi_total_fast_retrans,
+			     (unsigned int)r->tcp_info.tcpi_total_rto_retrans,
+			     (int)r->tcp_info.tcpi_dupthresh,
+			     (unsigned int)r->tcp_info.tcpi_last_reor_sample,
+			     (unsigned int)r->tcp_info.tcpi_total_dsacks,
 			     (unsigned int)r->tcp_info.tcpi_snd_mss,
 			     r->pmtu, comment_buffer));
 	strncpy(report_buffer, rep_string, sizeof(report_buffer));
