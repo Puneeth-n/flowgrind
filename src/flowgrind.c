@@ -1857,7 +1857,7 @@ static void print_report(int id, int endpoint, struct _report* r)
 			     (double)r->tcp_info.tcpi_rttvar / 1e3,
 			     (double)r->tcp_info.tcpi_rto / 1e3,
 			     (unsigned int)r->tcp_info.tcpi_backoff,
-			     r->tcp_info.tcpi_ca_state,
+			     (int)r->tcp_info.tcpi_dupthresh,
 			     (unsigned int)r->tcp_info.tcpi_total_retrans,
 			     (unsigned int)r->tcp_info.tcpi_total_fast_retrans,
 			     (unsigned int)r->tcp_info.tcpi_total_rto_retrans,
